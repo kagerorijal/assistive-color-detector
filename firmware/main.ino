@@ -1,3 +1,20 @@
+/*
+ * Project  : Color Recognition Assistive Device
+ * Board    : Arduino Nano (ATmega328P)
+ * Sensor   : TCS34725
+ * Audio    : DFPlayer Mini
+ * Author   : Arizal I W
+ * 
+ * Description:
+ * Reads RGB data from TCS34725 sensor,
+ * converts to HSV, normalizes values,
+ * applies 1-Nearest Neighbor classification,
+ * and plays corresponding audio feedback.
+ *
+ * Note:
+ * Designed for visually impaired assistance.
+ */
+
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"
 
@@ -15,6 +32,10 @@ struct ColorData {
   const char* label;
 };
 
+// HSV training dataset
+// Format: {Hue, Saturation, Value}
+// Values are normalized between 0–1
+// Used for 1-NN classification
 ColorData dataset[] = {
   {46, 0.38, 0.40, 46, 3651, "Hitam Sulfur"},
   {1, 0.81, 0.83, 0, 0, "Merah Cabe"},
@@ -101,6 +122,8 @@ int tombolPin = 2;
 bool tombolSudahDitekan = false;
 
 void setup() {
+  // Initialize sensor and verify communication
+  // If sensor not detected, system will halt
   Serial.begin(9600);
   if (tcs.begin()) {
     Serial.println("TCS34725 detected.");
@@ -110,7 +133,9 @@ void setup() {
   }
 
   mySerial.begin(9600);
-  
+
+  // Initialize DFPlayer Mini for audio output
+  // Ensure SD card with pre-recorded MP3 files is inserted
   if (!myDFPlayer.begin(mySerial)) {
     Serial.println("Gagal komunikasi dengan DFPlayer.");
     //while (true);
@@ -122,12 +147,19 @@ void setup() {
   pinMode(tombolPin, INPUT_PULLUP);
 }
 
+// Main system loop
+// Wait for button press -> Read color -> Classify -> Play audio
 void loop() {
+  // Read raw RGB values from TCS34725
+  // Sensor provides 16-bit color values
+  // Lighting condition affects raw output
   uint16_t r, g, b, c;
   tcs.getRawData(&r, &g, &b, &c);
 
   if (c == 0) c = 1;
 
+  // Normalize HSV values to 0–1 range
+  // Required for Euclidean distance calculation
   float r_scaled = ((float)r / c) * 255.0;
   float g_scaled = ((float)g / c) * 255.0;
   float b_scaled = ((float)b / c) * 255.0;
@@ -148,6 +180,9 @@ void loop() {
   float nlux = (lux - minLux) / (maxLux - minLux);
   float ntemp = (temp - minTemp) / (maxTemp - minTemp);
 
+  // Calculate Euclidean distance between measured HSV
+  // and each training data point
+  // Using k = 1 (nearest neighbor)
   float distances[dataCount];
   for (int i = 0; i < dataCount; i++) {
     float dh = (nh - (dataset[i].h - minH) / (maxH - minH));
@@ -193,8 +228,12 @@ void loop() {
     }
   }
 
+  // Trigger color detection only when button is pressed
+  // Prevent continuous sampling to reduce noise
   if (digitalRead(tombolPin) == LOW && !tombolSudahDitekan) {
     tombolSudahDitekan = true;
+    // Play corresponding audio file
+    // File number corresponds to classified color index
     myDFPlayer.play(bestIndex + 1);
     Serial.print("Deteksi warna: ");
     Serial.print(dataset[bestIndex].label);
@@ -204,7 +243,7 @@ void loop() {
     Serial.print(" V: "); Serial.print((int)(v * 100));
     Serial.print(" | Lux: "); Serial.print((int)lux);
     Serial.print(" | Temp: "); Serial.println((int)temp);
-    delay(1000);
+    delay(1000); // Small delay to avoid repeated triggering
   } 
   
   /*Serial.print(" | H: "); Serial.print((int)h);
@@ -220,11 +259,16 @@ void loop() {
 }
 
 void rgbToHsv(float r, float g, float b, float *h, float *s, float *v) {
+  // Convert RGB (0–255) to HSV representation
+  // HSV used because it separates chromatic information (Hue)
+  // from intensity (Value), improving classification robustness
   r /= 255.0; g /= 255.0; b /= 255.0;
   float maxVal = max(r, max(g, b));
   float minVal = min(r, min(g, b));
   float delta = maxVal - minVal;
 
+  // Hue calculation based on dominant RGB channel
+  // Result scaled to 0–360 degrees
   if (delta == 0) {
     *h = 0;
   } else if (maxVal == r) {
@@ -238,3 +282,10 @@ void rgbToHsv(float r, float g, float b, float *h, float *s, float *v) {
   *s = (maxVal == 0) ? 0 : delta / maxVal;
   *v = maxVal;
 }
+
+/*
+ * Limitations:
+ * - Sensitive to ambient lighting changes
+ * - Dataset limited to predefined colors
+ * - No adaptive calibration implemented
+ */
