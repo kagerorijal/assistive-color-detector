@@ -95,7 +95,7 @@ Lightweight classification algorithm.
 📈 Possible Improvements
 Expand dataset for more color variations
 Add adaptive lighting compensation
-Implement k > 1 voting
+Implement k>1 voting
 Add rechargeable charging circuit (TP4056)
 Add haptic feedback option
 
