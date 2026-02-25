@@ -5,28 +5,27 @@ Assistive Device for the Visually Impaired using Arduino Nano
 This project presents a low-cost, portable color recognition system designed to assist visually impaired users in identifying object colors independently.
 
 The device uses:
->  Arduino Nano as the main controller
->  TCS34725 color sensor for RGB detection
->  k-Nearest Neighbor (k-NN) algorithm for color classification
->  DFPlayer Mini for voice output
+Arduino Nano as the main controller.
+TCS34725 color sensor for RGB detection.
+k-Nearest Neighbor (k-NN) algorithm for color classification.
+DFPlayer Mini for voice output.
 
 When the user presses a button, the device detects the color of an object and announces it through a speaker.
 
 🎯 Objectives
->  Develop a compact and affordable assistive device
->  Implement lightweight color classification directly on a microcontroller
->  Provide real-time voice feedback
->  Ensure portability using rechargeable batteries
+Develop a compact and affordable assistive device.
+Implement lightweight color classification directly on a microcontroller.
+Provide real-time voice feedback.
+Ensure portability using rechargeable batteries.
 
 🛠 Hardware Components
-Component	                      Function
-Arduino Nano	                  Main microcontroller
-TCS34725 RGB Sensor	            Captures object color in RGB
-DFPlayer Mini	                  Plays audio feedback
-8Ω Speaker	                    Outputs voice
-Push Button                    	Triggers detection
-2x 18650 Batteries	            Power supply
-3D Printed Case (PLA)	          Enclosure
+Arduino Nano = Main microcontroller
+TCS34725 RGB Sensor = Captures object color in RGB
+DFPlayer Mini = Plays audio feedback
+8Ω Speaker = Outputs voice
+Push Button = Triggers detection
+2x 18650 Batteries = Power supply
+3D Printed Case (PLA) = Enclosure
 
 ⚙️ System Architecture
 System Flow
@@ -41,13 +40,13 @@ System Flow
 🧠 Algorithm Implementation
 1️⃣ RGB to HSV Conversion
 Steps:
->  Normalize R, G, B to [0,1]
->  Compute:
-    >  Max = max(R,G,B)
-    >  Min = min(R,G,B)
-    >  V = Max
-    >  S = (Max − Min) / Max
->  Compute Hue based on dominant channel
+Normalize R, G, B to [0,1]
+Compute:
+    Max = max(R,G,B)
+    Min = min(R,G,B)
+    V = Max
+    S = (Max − Min) / Max
+Compute Hue based on dominant channel
 
 2️⃣ Normalization
 Each HSV component normalized:
@@ -62,43 +61,43 @@ The dataset is stored directly in the Arduino code as:
 {H, S, V, "color.mp3"}
 
 🔊 Audio Output
->  Pre-recorded color names stored in microSD card
->  DFPlayer Mini plays matching .mp3 file
->  Example files:
-  >  red.mp3
-  >  blue.mp3
-  >  green.mp3
-  >  etc.
+Pre-recorded color names stored in microSD card.
+DFPlayer Mini plays matching .mp3 file.
+Example files:
+    red.mp3
+    blue.mp3
+    green.mp3
+    etc.
 
 🔬 Testing & Results
 The system was tested under:
->  Different lighting conditions
->  Object distances (0 cm and 3 cm)
->  Challenging colors (black, gray, white)
+Different lighting conditions.
+Object distances (0 cm and 3 cm).
+Challenging colors (black, gray, white).
 
 Results show reliable recognition of basic colors under stable lighting.
 
 📦 Physical Design
->  3D printed PLA casing
->  Approximate dimensions: 10 cm × 6 cm × 5.5 cm
->  Front sensor opening
->  Top push button
->  Speaker vent holes
->  Portable and standalone
+3D printed PLA casing.
+Approximate dimensions: 10 cm × 6 cm × 5.5 cm.
+Front sensor opening.
+Top push button.
+Speaker vent holes.
+Portable and standalone.
 
 🚀 Features
-✔ Portable
-✔ Low-cost components
-✔ Standalone (no external display needed)
-✔ Real-time voice feedback
-✔ Lightweight classification algorithm
+Portable.
+Low-cost components.
+Standalone (no external display needed).
+Real-time voice feedback.
+Lightweight classification algorithm.
 
 📈 Possible Improvements
->  Expand dataset for more color variations
->  Add adaptive lighting compensation
->  Implement k > 1 voting
->  Add rechargeable charging circuit (TP4056)
->  Add haptic feedback option
+Expand dataset for more color variations
+Add adaptive lighting compensation
+Implement k > 1 voting
+Add rechargeable charging circuit (TP4056)
+Add haptic feedback option
 
 📚 Keywords
 Color Recognition, Assistive Technology, Arduino Nano, TCS34725, k-NN, Voice Output, Embedded System
